@@ -1,0 +1,104 @@
+{
+    "questions": [
+        {
+            "question": "Finish these lyrics from the 2016 song &quot;Panda&quot; by Desiigner: &quot;I got broads in _______&quot;.",
+            "options": [
+                "Savannah",
+                "Augusta",
+                "Atlanta",
+                "Marietta"
+            ],
+            "correctAnswer": "Atlanta"
+        },
+        {
+            "question": "The &quot;K&quot; in &quot;K-Pop&quot; stands for which word?",
+            "options": [
+                "Kuwaiti",
+                "Korean",
+                "Kazakhstan",
+                "Kenyan"
+            ],
+            "correctAnswer": "Korean"
+        },
+        {
+            "question": "During the game&#039;s development, what was the first ever created Pok&eacute;mon?",
+            "options": [
+                "Arceus",
+                "Bulbasaur",
+                "Rhyhorn",
+                "Mew"
+            ],
+            "correctAnswer": "Rhyhorn"
+        },
+        {
+            "question": "When was Left 4 Dead 2 released?",
+            "options": [
+                "May 3, 2008",
+                "November 30, 2009",
+                "June 30, 2010",
+                "November 17, 2009"
+            ],
+            "correctAnswer": "November 17, 2009"
+        },
+        {
+            "question": "Which of these is NOT a name of a city in the main island of PLAYERUNKNOWN&#039;S BATTLEGROUNDS?",
+            "options": [
+                "Georgopol",
+                "Pochinki",
+                "Yasnaya Polyana",
+                "Belushya Guba"
+            ],
+            "correctAnswer": "Belushya Guba"
+        },
+        {
+            "question": "Which &quot;Green Arrow&quot; sidekick commonly wears a baseball cap?",
+            "options": [
+                "Black Canary",
+                "Emiko Queen",
+                "Dick Grayson",
+                "Roy Harper"
+            ],
+            "correctAnswer": "Roy Harper"
+        },
+        {
+            "question": "Which country, not including Japan, has the most people of japanese decent?",
+            "options": [
+                "Brazil",
+                "United States of America",
+                "South Korea",
+                "China"
+            ],
+            "correctAnswer": "Brazil"
+        },
+        {
+            "question": "Which member of the Velvet Room is not a playable character in Persona 4 Arena Ultimax?",
+            "options": [
+                "Theodore",
+                "Elizabeth",
+                "Margaret",
+                "Marie"
+            ],
+            "correctAnswer": "Theodore"
+        },
+        {
+            "question": "Who won the 2017 Formula One World Drivers&#039; Championship?",
+            "options": [
+                "Sebastian Vettel",
+                "Lewis Hamilton",
+                "Nico Rosberg",
+                "Max Verstappen"
+            ],
+            "correctAnswer": "Lewis Hamilton"
+        },
+        {
+            "question": "Which of these countries is not a United Nations member state?",
+            "options": [
+                "Tuvalu",
+                "Montenegro",
+                "South Sudan",
+                "Niue"
+            ],
+            "correctAnswer": "Niue"
+        }
+    ]
+}

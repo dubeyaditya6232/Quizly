@@ -1,0 +1,15 @@
+task left
+1)form validation  (temp)                               .....
+2)display test details  (temp)                          //done
+3)customize app as per userID (Must)                    //done
+4)add protected Route (Must)                            //done
+5)date form type (Must)                                 //done
+6)handle abrupt closing of test (Must)                  //done
+7)test scheduling and related stuff (Must)              //done
+8)student dashboard showing relevant tests (Must)       //done
+9)remove option in options of question (temp)           //done
+10)option to delete question in edit section (temp)     //done
+11)Admin page (temp)                                    .....
+12)add Loading (login/register)button after 1 click     //done
+13)show results of all the students to coordinator      //done
+14)problems related to back button handling             //done
