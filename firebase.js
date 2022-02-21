@@ -3,14 +3,16 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
+import {apiKey,authDomain,projectId,storageBucket,messagingSenderId,appId,measurementId} from '@env'
+
 const firebaseConfig = {
-  apiKey: "AIzaSyBraC_dvTP2_cmxCUeKFut9DqA3drYzbA0",
-  authDomain: "quiz-73e09.firebaseapp.com",
-  projectId: "quiz-73e09",
-  storageBucket: "quiz-73e09.appspot.com",
-  messagingSenderId: "159610694531",
-  appId: "1:159610694531:web:768711cc917033b465a4b6",
-  measurementId: "G-HEB8N72TRX"
+  apiKey: apiKey,
+  authDomain: authDomain,
+  projectId: projectId,
+  storageBucket: storageBucket,
+  messagingSenderId: messagingSenderId,
+  appId: appId,
+  measurementId: measurementId,
 };
 
 // Initialize Firebase
