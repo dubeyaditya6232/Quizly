@@ -1,5 +1,7 @@
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, BackHandler } from 'react-native'
 import React, { useState, useEffect } from 'react'
+import { Picker } from '@react-native-picker/picker';
+import moment from 'moment';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import uuid from 'react-native-uuid';
@@ -23,18 +25,83 @@ const EditTest = ({ navigation, route }) => {
     const [testTime, setTestTime] = useState(test.testTime ? test.testTime.toDate() : new Date());
     const [date, setDate] = useState(test.testDate ? test.testDate.toDate() : new Date());
     const [testDuration, setTestDuration] = useState(test.testDuration ? test.testDuration : { hours: 0, minutes: 0, seconds: 0 });
-    const [questions, setQuestions] = useState(test.questions ? test.questions : [ques]);
+    const [questions, setQuestions] = useState(test.questions ? test.questions : []);
     const [option, setOption] = useState({
         optionId: uuid.v4(),
         option: ``
     });
     const [showDateSelector, setShowDateSelector] = useState(false);
     const [showTimeSelector, setShowTimeSelector] = useState(false);
-    const [error, setError] = useState({});
-    const [firebaseError, setFirebaseError] = useState('');
+
+
+    //validation state variables
+    const [firebaseError, setFireBaseError] = useState('');
+    const [testNameError, setTestNameError] = useState('');
+
+    let fetchedError = []
+    for (let i = 0; i < questions.length; i++) {
+        let options = [];
+        for (let j = 0; j < questions[i].options.length; j++) {
+            options.push(null);
+        }
+        fetchedError.push({
+            question: null,
+            options: options,
+            answer: ''
+        });
+    };
+
+    const [error, setError] = useState([...fetchedError])
+
+    const validateAddOption = (index) => {
+        let check = questions[index].options.some(opt => opt.option === '')
+
+        if (check) {
+            let customError = [...error]
+            for (let i = 0; i < questions[index].options.length; i++) {
+                if (questions[index].options[i].option === '') {
+                    customError[index].options[i] = 'Required';
+                }
+            }
+            setError(customError);
+        }
+
+        return !check;
+    }
+
+    const validateAddQuestion = () => {
+        let check = questions.some(ques => ques.question === '' || ques.answer==='' || ques.options.some(opt => opt.option === ''));
+
+        if (check) {
+            let customError = [...error];
+            for (let i = 0; i < questions.length; i++) {
+                if (questions[i].question === '') {
+                    customError[i].question = 'Required'
+                }
+                if(questions[i].answer === ''){
+                    customError[i].answer = 'Required'
+                }
+                for (let j = 0; j < questions[i].options.length; j++) {
+                    if (questions[i].options[j].option === '') {
+                        customError[i].options[j] = 'Required'
+                    }
+                }
+            }
+            setError(customError);
+        }
+
+        return !check
+    };
+
+    const validateEditTest = () => {
+        if (validateAddQuestion() && testNameError === '')
+            return true;
+        else
+            return false;
+    };
 
     const handleEdit = async () => {
-        if (Object.keys(error).length > 0) {
+        if (validateEditTest()) {
             const docRef = doc(db, 'Test', test.id);
             const data = {
                 testName: testName,
@@ -47,22 +114,24 @@ const EditTest = ({ navigation, route }) => {
                 .then(() => {
                     navigation.navigate('CoordinatorDashboard')
                 }, err => {
+                    setFireBaseError(err.message);
                     console.log(err)
-                    setFirebaseError(err.message)
                 })
                 .catch(err => {
+                    setFireBaseError(err.message);
                     console.log(err)
-                    setFirebaseError(err.message)
                 })
-        }
-        else{
-            alert('Please fill all the fields');
         }
     }
 
     const addQuestion = () => {
-        if (Object.keys(error).length === 0) {
+        if (validateAddQuestion()) {
             setQuestions(questions.concat(ques));
+            setError(error.concat({
+                question: null,
+                options: [],
+                answer: ''
+            }))
             setQues({
                 questionId: uuid.v4(),
                 question: '',
@@ -73,34 +142,97 @@ const EditTest = ({ navigation, route }) => {
                 answer: '',
             });
         }
-        else {
-            alert('Please fill all the above fields');
+    }
+
+    const addOption = (id, index) => {
+        if (validateAddOption(index)) {
+            setQuestions(questions.map((question, index) => {
+                if (question.questionId === id) {
+                    question.options.push(option);
+                }
+                return question;
+            }))
+            let customError = [...error];
+            customError[index].options.push(null);
+            setError(customError);
+            setOption({
+                optionId: uuid.v4(),
+                option: ''
+            })
         }
     };
 
-    const addOption = (id) => {
-        setQuestions(questions.map((question, index) => {
-            if (question.questionId === id) {
-                question.options.push(option);
-            }
-            return question;
-        }))
-        setOption({
-            optionId: uuid.v4(),
-            option: ``
-        })
-    };
-
-    const deleteQuestion = (questionId) => {
+    const deleteQuestion = (questionId, index) => {
         setQuestions(questions.filter((question) => question.questionId !== questionId));
+        let customError = [...error];
+        customError.splice(index, 1)
+        setError(customError);
     }
-    const removeOption = (questionId, optionId) => {
+    const removeOption = (questionId, optionId, questionIndex, optionIndex) => {
         setQuestions(questions.map((question, index) => {
             if (question.questionId === questionId) {
                 question.options = question.options.filter((option) => option.optionId !== optionId);
             }
             return question;
-        }))
+        }));
+        let customError = [...error];
+        customError[questionIndex].options.splice(optionIndex, 1);
+        setError(customError);
+    };
+
+    const handleAnswerChange = (text, questionId,questionIndex) => {
+        setQuestions(questions.map(question => {
+            if (question.questionId === questionId) {
+                question.answer = text;
+            }
+            return question;
+        }));
+        let customError = [...error];
+        if(text===''){
+           customError[questionIndex].answer = 'Required';
+        }
+        else{
+            customError[questionIndex].answer = '';
+        }
+        setError(customError);
+    };
+
+    const handleQuestionChange = (text, questionId, index) => {
+        setQuestions(questions.map(question => {
+            if (question.questionId === questionId) {
+                question.question = text;
+            }
+            return question;
+        }));
+        let customError = [...error];
+        if (text.length === 0) {
+            customError[index].question = "Required";
+        }
+        else {
+            customError[index].question = null;
+        }
+    };
+
+    const handleOptionChange = (text, questionId, optionId, questionIndex, optionIndex) => {
+        setQuestions(questions.map((que, idx) => {
+            if (que.questionId === questionId) {
+                que.options = que.options.map((opt, idx) => {
+                    if (opt.optionId === optionId) {
+                        opt.option = text
+                    }
+                    return opt
+                })
+            }
+            return que
+        }));
+        let customError = [...error];
+        if (text === '') {
+            customError[questionIndex].options[optionIndex] = 'Required'
+        }
+        else {
+            customError[questionIndex].options[optionIndex] = '';
+        }
+        setError(customError)
     };
 
     useEffect(() => {
@@ -125,7 +257,7 @@ const EditTest = ({ navigation, route }) => {
                     <Text style={styles.headingText}>Edit Test Details</Text>
                 </View>
                 <View style={styles.errorContainer}>
-                    {!firebaseError ? null : <Text style={styles.error}>{firebaseError}</Text>}
+                    {!firebaseError ? null : <Text style={styles.errorText}>{firebaseError}</Text>}
                 </View>
                 <View>
                     <Text>Test Name</Text>
@@ -136,17 +268,19 @@ const EditTest = ({ navigation, route }) => {
                             value={testName}
                             onChangeText={(text) => {
                                 setTestName(text)
-                                if (text.length > 0) {
-                                    let updatedError = { ...error }
-                                    delete updatedError.testName
-                                    setError(updatedError)
+                                if (text === '') {
+                                    setTestNameError('Required')
                                 }
-                                else
-                                    setError({ ...error, testName: false })
+                                else if (text.length < 3) {
+                                    setTestNameError('length should be atleast 3 digit');
+                                }
+                                else {
+                                    setTestNameError('')
+                                }
                             }}
                         />
                     </TouchableOpacity>
-                    {error.testName === false ? <Text style={styles.error}>Test Name is required</Text> : null}
+                    {!testNameError ? null : <Text style={styles.errorText}>{testNameError}</Text>}
                     <Text>Test Date</Text>
                     <TouchableOpacity
                         onPress={() => setShowDateSelector(true)}
@@ -166,8 +300,7 @@ const EditTest = ({ navigation, route }) => {
                             style={styles.input}
                             placeholder="Select Test Date"
                             editable={false}
-                            placeholderTextColor="white"
-                            value={JSON.stringify(date.getDate()) + "/" + JSON.stringify(date.getMonth() + 1) + "/" + JSON.stringify(date.getFullYear())}
+                            value={moment(date).format('DD-MM-YYYY')}
                         />
                     </TouchableOpacity>
                     <Text>Test Time</Text>
@@ -189,7 +322,7 @@ const EditTest = ({ navigation, route }) => {
                             style={styles.input}
                             placeholder="Enter Test Time"
                             editable={false}
-                            value={JSON.stringify(testTime.getHours()) + ":" + JSON.stringify(testTime.getMinutes())}
+                            value={moment(testTime).format('hh:mm A')}
                         />
                     </TouchableOpacity>
                     <Text>Test Duration</Text>
@@ -209,7 +342,7 @@ const EditTest = ({ navigation, route }) => {
                                     <Text style={styles.questionText}>Question {index + 1}</Text>
                                     <TouchableOpacity
                                         style={styles.Icon}
-                                        onPress={() => deleteQuestion(ques.questionId)}
+                                        onPress={() => deleteQuestion(ques.questionId, index)}
                                     >
                                         <Icon
                                             name="delete"
@@ -223,24 +356,10 @@ const EditTest = ({ navigation, route }) => {
                                         style={styles.input}
                                         placeholder="Enter Question"
                                         value={questions[index].question}
-                                        onChangeText={(text) => {
-                                            setQuestions(questions.map((que, idx) => {
-                                                if (que.questionId === ques.questionId) {
-                                                    que.question = text
-                                                }
-                                                return que
-                                            }))
-                                            if (text.length > 0) {
-                                                let updatedError = { ...error }
-                                                delete updatedError[`question${index}`]
-                                                setError(updatedError)
-                                            }
-                                            else
-                                                setError({ ...error, [`question${index}`]: false })
-                                        }}
+                                        onChangeText={(text) => { handleQuestionChange(text, ques.questionId, index) }}
                                     />
                                 </TouchableOpacity>
-                                {error[`question${index}`] === false ? <Text style={styles.error}>Question is required</Text> : null}
+                                {!error[index].question ? null : <Text style={styles.errorText}>{error[index].question}</Text>}
                                 {
                                     ques.options.map((option, idx) => {
                                         return (
@@ -249,7 +368,7 @@ const EditTest = ({ navigation, route }) => {
                                                     <Text>Option {idx + 1}</Text>
                                                     <TouchableOpacity
                                                         style={styles.Icon}
-                                                        onPress={() => removeOption(ques.questionId, option.optionId)}
+                                                        onPress={() => removeOption(ques.questionId, option.optionId, index, idx)}
                                                     >
                                                         <Icon
                                                             name="delete"
@@ -264,28 +383,11 @@ const EditTest = ({ navigation, route }) => {
                                                         placeholder={`Enter Option ${idx + 1}`}
                                                         value={questions[index].options[idx].option}
                                                         onChangeText={(text) => {
-                                                            setQuestions(questions.map((que, idx) => {
-                                                                if (que.questionId === ques.questionId) {
-                                                                    que.options = que.options.map((opt, idx) => {
-                                                                        if (opt.optionId === option.optionId) {
-                                                                            opt.option = text
-                                                                        }
-                                                                        return opt
-                                                                    })
-                                                                }
-                                                                return que
-                                                            }))
-                                                            if (text.length > 0) {
-                                                                let updatedError = { ...error }
-                                                                delete updatedError[`option${index + 1}${idx + 1}`]
-                                                                setError(updatedError)
-                                                            }
-                                                            else
-                                                                setError({ ...error, [`option${index + 1}${idx + 1}`]: false })
+                                                            handleOptionChange(text, ques.questionId, option.optionId, index, idx)
                                                         }}
                                                     />
                                                 </TouchableOpacity>
-                                                {error[`option${index + 1}${idx + 1}`] === false ? <Text style={styles.error}>required</Text> : null}
+                                                {!error[index].options[idx] ? null : <Text style={styles.errorText}>{error[index].options[idx]}</Text>}
                                             </View>
                                         );
                                     })
@@ -293,37 +395,27 @@ const EditTest = ({ navigation, route }) => {
                                 <View style={styles.buttonContainer} >
                                     <TouchableOpacity
                                         style={styles.button}
-                                        onPress={() => addOption(ques.questionId)}
+                                        onPress={() => addOption(ques.questionId, index)}
                                     >
                                         <Text style={styles.buttonText}>Add option</Text>
                                     </TouchableOpacity>
                                 </View>
                                 <Text style={styles.text}>Answer</Text>
-                                <TouchableOpacity
-                                    style={styles.text}
+                                <Picker
+                                    selectedValue={ques.answer}
+                                    style={styles.formInputText}
+                                    onValueChange={(itemValue, itemIndex) => {
+                                        handleAnswerChange(itemValue, ques.questionId, index)
+                                    }}
                                 >
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="Enter Answer"
-                                        value={questions[index].answer}
-                                        onChangeText={(text) => {
-                                            setQuestions(questions.map((que, idx) => {
-                                                if (que.questionId === ques.questionId) {
-                                                    que.answer = text
-                                                }
-                                                return que
-                                            }))
-                                            if (text.length > 0) {
-                                                let updatedError = { ...error }
-                                                delete updatedError[`answer${index + 1}`]
-                                                setError(updatedError)
-                                            }
-                                            else
-                                                setError({ ...error, [`answer${index + 1}`]: false })
-                                        }}
-                                    />
-                                </TouchableOpacity>
-                                {error[`answer${index + 1}`] === false ? <Text style={styles.error}>Answer is required</Text> : null}
+                                    <Picker.Item  label='Select Options' value='' key='Select'/>
+                                    {ques.options.map((option, index) => {
+                                        return (
+                                            <Picker.Item label={option.option} value={option.option} key={option.optionId} />
+                                        )
+                                    })}
+                                </Picker>
+                                {!error[index].answer ? null : <Text style={styles.errorText}>{error[index].answer}</Text>}
                             </View>
                         );
                     })}
@@ -356,7 +448,7 @@ const styles = StyleSheet.create({
     },
     input: {
         borderRadius: 16,
-        backgroundColor: '#184E77',
+        backgroundColor: '#4a8cff',
         padding: 8,
         marginBottom: 8,
     },
@@ -366,7 +458,7 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         paddingHorizontal: 16,
-        flexDirection: 'row',
+        flexDirection: 'column',
         justifyContent: 'flex-end',
     },
     button: {
@@ -397,12 +489,12 @@ const styles = StyleSheet.create({
     },
     addButtonText: {
         fontSize: 16,
-        backgroundColor: 'grey',
+        backgroundColor: 'gray',
         padding: 12,
         borderRadius: 16,
     },
     TimePicker: {
-        backgroundColor: '#184E77',
+        backgroundColor: '#4a8cff',
         borderRadius: 16,
     },
     iconBox: {
@@ -416,12 +508,20 @@ const styles = StyleSheet.create({
     Icon: {
         padding: 4,
     },
-    error: {
+    errorText: {
         color: "red",
-        paddingHorizontal: 24,
+        padding: 4,
     },
     errorContainer: {
         alignItems: 'center',
         padding: 8,
     },
+    formInputText: {
+        backgroundColor: '#4a8cff',
+        color: 'yellow',
+        padding: 8,
+    },
+    itemStyle: {
+        backgroundColor: '#4a8cff'
+    }
 })

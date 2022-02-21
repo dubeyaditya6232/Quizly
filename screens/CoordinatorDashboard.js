@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, View, TouchableOpacity, BackHandler,Alert } from 'react-native'
+import { ScrollView, StyleSheet, Text, View, TouchableOpacity, BackHandler, Alert } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import ShowCards from '../components/ShowCards'
 
@@ -15,7 +15,7 @@ const CoordinatorDashboard = ({ navigation }) => {
 
     const fetchTestList = () => {
         const collectionRef = collection(db, "Test");
-        const q=query(collectionRef,where('coordinatorId','==',user.uid));
+        const q = query(collectionRef, where('coordinatorId', '==', user.uid));
         return onSnapshot(q, (snapshot) => {
             const data = snapshot.docs.map(doc => ({
                 id: doc.id,
@@ -39,18 +39,18 @@ const CoordinatorDashboard = ({ navigation }) => {
                 ' Do you want to go back ?',
                 ' You will be logged out!',
                 [
-                  {
-                    text: 'Yes', onPress: () => {
-                      navigation.navigate('Home');
+                    {
+                        text: 'Yes', onPress: () => {
+                            navigation.navigate('Home');
+                        }
+                    },
+                    {
+                        text: 'No', onPress: () => console.log('NO Pressed')
                     }
-                  },
-                  {
-                    text: 'No', onPress: () => console.log('NO Pressed')
-                  }
                 ],
                 { cancelable: false },
-              ); 
-              return true
+            );
+            return true
         }
         BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
@@ -90,10 +90,9 @@ const CoordinatorDashboard = ({ navigation }) => {
                             <Text style={styles.buttonText}>Create Test</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            style={styles.logoutButton}
                             onPress={handleLogout}
                         >
-                            <Text style={styles.logoutButtonText}>Logout</Text>
+                            <Text style={styles.buttonText}>Logout</Text>
                         </TouchableOpacity>
                     </View>
 
@@ -161,22 +160,11 @@ const styles = StyleSheet.create({
     buttonText: {
         fontSize: 20,
         fontWeight: '600',
-        backgroundColor: '#184E77',
+        backgroundColor: '#4a8cff',
         padding: 12,
         borderRadius: 16,
     },
     cardContainer: {
         flexDirection: 'column',
-    },
-    logoutButton: {
-        alignItems: 'flex-end',
-        padding: 8,
-    },
-    logoutButtonText: {
-        fontSize: 20,
-        padding: 12,
-        backgroundColor: '#184E77',
-        borderRadius: 16,
-        color: 'white',
     },
 })

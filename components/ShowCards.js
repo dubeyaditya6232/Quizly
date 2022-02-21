@@ -84,22 +84,26 @@ const ShowCards = ({ navigation, test, testList, setTestList }) => {
                 <View style={styles.menu}>
                     <View style={styles.menuContainer}>
                         <TouchableOpacity
+                            style={styles.menuItem}
                             onPress={() => testResults(test)}
                         >
                             <Text style={styles.menuText}>Results</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             onPress={() => testDetails(test)}
+                            style={styles.menuItem}
                         >
                             <Text style={styles.menuText}>Details</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             onPress={() => editTest(test)}
+                            style={styles.menuItem}
                         >
                             <Text style={styles.menuText}>Edit</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             onPress={() => deleteTest(test.id)}
+                            style={styles.menuItem}
                         >
                             <Text style={styles.menuText}>Delete</Text>
                         </TouchableOpacity>
@@ -119,7 +123,7 @@ const styles = StyleSheet.create({
     testBoxContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        backgroundColor: '#184E77',
+        backgroundColor: '#4a8cff',
         padding: 10,
         borderRadius: 16,
         marginBottom: 6,
@@ -140,12 +144,20 @@ const styles = StyleSheet.create({
     },
     menuContainer: {
         width: '30%',
-        backgroundColor: '#184E77',
+        backgroundColor: '#07bcf8',
         borderRadius: 16,
-        padding: 10
+        padding: 6,
+        zIndex: 1,
     },
     menuText: {
         fontSize: 16,
         paddingHorizontal: 10
-    }
+    },
+    menuItem: {
+        borderWidth: 2,
+        borderColor: '#07255b',
+        padding: 2,
+        marginBottom: 2,
+        borderRadius: 8,
+    },
 })

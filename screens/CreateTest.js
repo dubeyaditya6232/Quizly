@@ -2,6 +2,7 @@ import { StyleSheet, Text, TouchableOpacity, View, TextInput, ScrollView,BackHan
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Title from '../components/Title'
 import React, { useState,useEffect } from 'react'
+import moment from 'moment';
 import { useUserAuth } from '../useContext';
 
 import { db } from '../firebase';
@@ -90,6 +91,7 @@ const CreateTest = ({ navigation }) => {
                         <TextInput
                             style={styles.input}
                             placeholder="Enter Test Name"
+                            value={testName}
                             onChangeText={(text) => onChange(text, 'testName')}
                         />
                     </TouchableOpacity>
@@ -114,7 +116,7 @@ const CreateTest = ({ navigation }) => {
                             placeholder="Select Test Date"
                             editable={false}
                             placeholderTextColor="white"
-                            value={JSON.stringify(date.getDate()) + "/" + JSON.stringify(date.getMonth() + 1) + "/" + JSON.stringify(date.getFullYear())}
+                            value={moment(date).format('DD-MM-YYYY')}
                         />
                     </TouchableOpacity>
                     <Text style={styles.inputLabel}>Test Time </Text>
@@ -136,7 +138,7 @@ const CreateTest = ({ navigation }) => {
                             style={styles.input}
                             placeholder="Enter Test Time"
                             editable={false}
-                            value={JSON.stringify(testTime.getHours()) + ":" + JSON.stringify(testTime.getMinutes())}
+                            value={moment(testTime).format('hh:mm A')}
                         />
                     </TouchableOpacity>
                     <Text style={styles.inputLabel}>Test Duration (hrs:mins)</Text>
@@ -185,7 +187,7 @@ const styles = StyleSheet.create({
     },
     input: {
         borderRadius: 16,
-        backgroundColor: '#184E77',
+        backgroundColor: '#4a8cff',
         padding: 8,
         marginBottom: 8,
     },
@@ -205,7 +207,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
     },
     TimePicker: {
-        backgroundColor: '#184E77',
+        backgroundColor: '#4a8cff',
         borderRadius: 16,
     },
     error: {

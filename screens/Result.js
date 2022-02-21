@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
   bottomText: {
     fontSize: 18,
     fontWeight: '600',
-    backgroundColor: '#184E77',
+    backgroundColor: '#4a8cff',
     padding: 12,
     borderRadius: 16,
   }

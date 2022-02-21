@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet, Image, BackHandler, ScrollView, TextInput,Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, BackHandler, ScrollView, TextInput, Alert } from 'react-native';
 import Title from '../components/Title';
 import React, { useEffect, useState } from 'react';
 
@@ -12,7 +12,7 @@ const Dashboard = ({ navigation }) => {
     const { user, logout } = useUserAuth();
     const [Search, setSearch] = useState('');
     const [searchError, setSearchError] = useState('');
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [searchResult, setSearchResult] = useState([]);
 
     useEffect(() => {
@@ -21,17 +21,17 @@ const Dashboard = ({ navigation }) => {
                 ' Do you want to go back ?',
                 ' You will be logged out!',
                 [
-                  {
-                    text: 'Yes', onPress: () => {
-                      navigation.navigate('Home');
+                    {
+                        text: 'Yes', onPress: () => {
+                            navigation.navigate('Home');
+                        }
+                    },
+                    {
+                        text: 'No', onPress: () => console.log('NO Pressed')
                     }
-                  },
-                  {
-                    text: 'No', onPress: () => console.log('NO Pressed')
-                  }
                 ],
                 { cancelable: false },
-              ); 
+            );
             return true;
         }
 
@@ -62,10 +62,11 @@ const Dashboard = ({ navigation }) => {
     }
 
     const handleSearch = async () => {
-        if(Search === '') {
+        if (Search === '') {
             setSearchError('This field is required');
         }
-        else{
+        else {
+            setLoading(true);
             const collectionRef = collection(db, "Test");
             const q = query(collectionRef, where('testCode', '==', Search));
             return onSnapshot(q, (snapshot) => {
@@ -80,14 +81,13 @@ const Dashboard = ({ navigation }) => {
                     }))
                     setSearchError('');
                     setSearchResult([...data])
-                    setLoading(false)
                     setSearch('')
                 }
+                setLoading(false)
             })
         }
     };
     const handleTestClick = (test) => {
-        console.log("ran all these lines");
         setSearchResult([]);
         setLoading(true);
         setSearchError('');
@@ -121,9 +121,12 @@ const Dashboard = ({ navigation }) => {
                             <TextInput
                                 style={styles.inputText}
                                 placeholder="Enter test code"
-                                placeholderTextColor="gray"
+                                placeholderTextColor="#fff"
                                 value={Search}
-                                onChangeText={(text) => setSearch(text)}
+                                onChangeText={(text) => {
+                                    setSearch(text)
+                                    setSearchError('')
+                                }}
                             />
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -133,9 +136,14 @@ const Dashboard = ({ navigation }) => {
                             <Text style={styles.buttonText}>Search</Text>
                         </TouchableOpacity>
                     </View>
+                    {!searchError ? null : (
+                        <View style={styles.error}>
+                            <Text style={styles.errorText}>{searchError}</Text>
+                        </View>
+                    )}
                     <View>
                         {(loading) ? (
-                            <Text>{''}</Text>
+                            <Text>Loading...</Text>
                         ) : (
                             (searchResult.length > 0) ? (
                                 <View>
@@ -154,12 +162,9 @@ const Dashboard = ({ navigation }) => {
                                     })}
                                 </View>
                             ) : (
-                                <Text>Loading...</Text>
+                                null
                             )
                         )}
-                    </View>
-                    <View style={styles.error}>
-                        <Text style={styles.searchText}>{searchError}</Text>
                     </View>
                 </View>
             </ScrollView>
@@ -191,7 +196,7 @@ const styles = StyleSheet.create({
     },
     button: {
         width: '30%',
-        backgroundColor: '#184E77',
+        backgroundColor: '#4a8cff',
         padding: 8,
         borderRadius: 16,
         alignItems: 'center',
@@ -209,7 +214,7 @@ const styles = StyleSheet.create({
     input: {
         width: '68%',
         fontSize: 18,
-        backgroundColor: '#184E77',
+        backgroundColor: '#4a8cff',
         padding: 8,
         borderRadius: 16,
 
@@ -224,9 +229,8 @@ const styles = StyleSheet.create({
     logoutButtonText: {
         fontSize: 18,
         padding: 12,
-        backgroundColor: '#184E77',
+        backgroundColor: '#4a8cff',
         borderRadius: 16,
-        color: 'white',
     },
     searchResultHeading: {
         fontSize: 18,
@@ -234,14 +238,19 @@ const styles = StyleSheet.create({
         padding: 8,
     },
     searchResult: {
-        backgroundColor: '#184E77',
+        backgroundColor: '#4a8cff',
         padding: 8,
         borderRadius: 16,
         alignItems: 'center',
     },
     searchText: {
+        fontSize: 18,
+        fontWeight: '600',
+        padding: 8,
+    },
+    errorText: {
         fontSize: 16,
-        color:'red'
-    }
+        color: 'red',
+    },
 });
 

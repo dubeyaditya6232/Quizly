@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet, BackHandler, Alert, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, BackHandler, Alert, ScrollView,Image } from 'react-native';
 import React from 'react';
 import { useEffect } from 'react';
 import Title from '../components/Title';
@@ -35,6 +35,12 @@ const Home = ({ navigation }) => {
     <ScrollView>
       <View style={styles.container}>
         <Title />
+        <View style={styles.bannerContainer}>
+          <Image source={require('../assets/quiz.png')}
+            style={styles.banner}
+            resizeMode="contain"
+          />
+        </View>
         <View style={styles.button}>
           <TouchableOpacity
             onPress={() => navigation.navigate("Register")}
@@ -48,6 +54,7 @@ const Home = ({ navigation }) => {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => navigation.navigate("AdminLogin")}
+            disabled={true}
           >
             <Text style={styles.buttonText}>Admin Login</Text>
           </TouchableOpacity>
@@ -73,18 +80,18 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 20,
     padding: 16,
-    backgroundColor: '#184E77',
+    backgroundColor: '#4a8cff',
     borderRadius: 12,
     marginBottom: 16,
   },
-  /*   banner: {
-      height: 300,
-      width: 300,
-    },
-    bannerContainer: {
-      alignItems: 'center',
-      justifyContent: 'center',
-      flex: 1,
-    }, */
+  banner: {
+    height: 300,
+    width: 300,
+  },
+  bannerContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+  },
 });
 

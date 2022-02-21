@@ -41,12 +41,14 @@ const StudentRegister = ({ navigation }) => {
                 ...error,
                 submitBtn: 'Please fill in all the fields'
             })
+            return false
         }
         else {
             setError({
                 ...error,
                 submitBtn: ''
             })
+            return true
         }
     };
 
@@ -123,7 +125,8 @@ const StudentRegister = ({ navigation }) => {
             setError({ ...error, [name]: `${name} is required` })
         }
         else {
-            setError({ ...error, [name]: '', submitBtn: '' })
+            setError({ ...error, [name]: '',submitBtn:'' })
+            setFirebaseError('')
         }
     }
 
@@ -180,7 +183,7 @@ const StudentRegister = ({ navigation }) => {
                         style={styles.formInput}>
                         <Picker
                             selectedValue={role}
-                            style={styles.formInputText}
+                            style={styles.formSelect}
                             onValueChange={(itemValue, itemIndex) => setRole(itemValue)}
                         >
                             <Picker.Item label="Student" value="Student" />
@@ -278,9 +281,12 @@ const styles = StyleSheet.create({
     },
     formInputText: {
         borderRadius: 16,
-        backgroundColor: '#184E77',
-        color: 'black',
+        backgroundColor: '#4a8cff',
         padding: 8,
+    },
+    formSelect: {
+        backgroundColor: '#4a8cff',
+        color: '#fff',
     },
     button: {
         width: '100%',
@@ -302,7 +308,7 @@ const styles = StyleSheet.create({
     bottomText: {
         fontSize: 16,
         paddingHorizontal: 8,
-        color: '#184E77',
+        color: '#4a8cff',
     },
     error: {
         alignItems: 'center',

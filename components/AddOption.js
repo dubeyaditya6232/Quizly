@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import uuid from 'react-native-uuid';
 import { Icon } from 'react-native-elements';
 
-const AddOption = ({ navigation, questions, setQuestions, questionIndex }) => {
+const AddOption = ({ navigation, questions, setQuestions, questionIndex, error, setError}) => {
 
     const [option, setOption] = useState({
         optionId: uuid.v4(),
@@ -11,69 +11,99 @@ const AddOption = ({ navigation, questions, setQuestions, questionIndex }) => {
     });
 
     const [optionArray, setOptionArray] = useState(questions[questionIndex].options);
-    const [error, setError] = useState({ error: "fill all the fields" });
-    const [saveMsg, setSaveMsg] = useState('');
-
-    const addOption = () => {
-        setQuestions(questions.map(question => {
-            if (question.questionId === questions[questionIndex].questionId) {
-                question.options.push(option);
+    
+    const validateOption = () => {
+        let check = questions[questionIndex].options.some(opt => opt.option === '');
+        if (check) {
+            let updatedError = [...error];
+            for (let i = 0; i < questions[questionIndex].options.length; i++) {
+                if (questions[questionIndex].options[i].option === '') {
+                    updatedError[questionIndex].options[i] = 'Option is required'
+                }
             }
-            return question;
-        }));
-        setOptionArray(optionArray.concat(option));
-        setOption({
-            optionId: uuid.v4(),
-            option: ``
-        });
-        setError({ ...error, error: "fill all the fields" });
-        setSaveMsg('');
+            setError(updatedError);
+        }
+
+        return !check;
     };
 
-    const handleTextChange = (text, optionId) => {
-        setSaveMsg('');
+    const addOption = () => {
+        if (validateOption()) {
+            setQuestions(questions.map(question => {
+                if (question.questionId === questions[questionIndex].questionId) {
+                    question.options.push(option);
+                }
+                return question;
+            }));
+            setOptionArray(optionArray.concat(option));
+            setOption({
+                optionId: uuid.v4(),
+                option: ``
+            });
+            let customError = [...error];
+            customError[questionIndex].options.push(null);
+            customError[questionIndex].saveMsg=''
+            setError(customError);
+        }
+    };
+
+    const handleTextChange = (text, optionId, index) => {
         setOptionArray(optionArray.map(opt => {
             if (opt.optionId === optionId) {
                 opt.option = text;
             }
             return opt;
         }));
-        if (text === '') {
-            setError({
-                ...error,
-                [optionId]: 'Option is required'
-            });
+        let customError = [...error];
+        if (text.length === 0) {
+            customError[questionIndex].options[index] = 'Option is required';
         }
         else {
-            let updatedError = { ...error };
-            delete updatedError[optionId];
-            setError({ ...updatedError, error: "" });
+            customError[questionIndex].options[index] = null;
         }
+        customError[questionIndex].saveMsg='';
+        setError(customError);
     };
 
+    const validation = () => {
+        let check = optionArray.some(opt => opt.option === '');
+        if (check) {
+            let updatedError = [...error];
+            for (let i = 0; i < optionArray.length; i++) {
+                if (optionArray[i].option === '') {
+                    updatedError[questionIndex].options[i] = 'Option is required'
+                }
+            }
+            setError(updatedError);
+        }
+        return !check;
+    }
+
     const handleSave = () => {
-        console.log(error);
-        if (error.error === "") {
+        console.log(error[questionIndex].options);
+        if (validation()) {
             setQuestions(questions.map(question => {
                 if (question.questionId === questions[questionIndex].questionId) {
                     question.options = optionArray;
                 }
                 return question;
             }));
-            setSaveMsg('Options successfully saved');
-        }
-        else {
-            alert(error.error);
+            let updatedError=[...error];
+            updatedError[questionIndex].saveMsg='Saved Successfully'
+            setError(updatedError)
         }
     };
-    const removeOption = (questionId, optionId) => {
-        setQuestions(questions.map((question, index) => {
+    const removeOption = (questionId, optionId, index) => {
+        setQuestions(questions.map((question, idx) => {
             if (question.questionId === questionId) {
                 question.options = question.options.filter((option) => option.optionId !== optionId);
             }
             return question;
         }))
         setOptionArray(optionArray.filter((option) => option.optionId !== optionId));
+        let customError = [...error];
+        customError[questionIndex].options.splice(index, 1);
+        setError(customError)
     };
 
     return (
@@ -86,7 +116,7 @@ const AddOption = ({ navigation, questions, setQuestions, questionIndex }) => {
                             <Text style={styles.inputLabel} >option {index + 1}</Text>
                             <TouchableOpacity
                                 style={styles.Icon}
-                                onPress={() => removeOption(questions[questionIndex].questionId, opt.optionId)}
+                                onPress={() => removeOption(questions[questionIndex].questionId, opt.optionId, index)}
                             >
                                 <Icon
                                     name="delete"
@@ -99,9 +129,9 @@ const AddOption = ({ navigation, questions, setQuestions, questionIndex }) => {
                             style={styles.input}
                             placeholder="Enter Option"
                             value={optionArray[index].option}
-                            onChangeText={(text) => handleTextChange(text, opt.optionId)}
+                            onChangeText={(text) => handleTextChange(text, opt.optionId, index)}
                         />
-                        {error[opt.optionId] ? <Text style={styles.errorText}>{error[opt.optionId]}</Text> : null}
+                        {(!error[questionIndex].options[index]) ? null : <Text style={styles.errorText}>{error[questionIndex].options[index]}</Text>}
                     </View>
                 );
             })}
@@ -119,7 +149,7 @@ const AddOption = ({ navigation, questions, setQuestions, questionIndex }) => {
                     <Text style={styles.buttonText}>Save</Text>
                 </TouchableOpacity>
             </View>
-            {saveMsg ? <Text style={styles.saveMsg}>{saveMsg}</Text> : null}
+            {!error[questionIndex].saveMsg ? null : <Text style={styles.saveMsg}>{error[questionIndex].saveMsg}</Text>}
         </View>
     )
 }
@@ -132,7 +162,7 @@ const styles = StyleSheet.create({
     },
     input: {
         borderRadius: 16,
-        backgroundColor: '#184E77',
+        backgroundColor: '#4a8cff',
         padding: 8,
         marginBottom: 8,
     },
@@ -170,5 +200,6 @@ const styles = StyleSheet.create({
     saveMsg: {
         textAlign: 'center',
         padding: 4,
+        color: 'green',
     }
 })

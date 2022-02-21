@@ -28,14 +28,24 @@ const Login = ({ navigation }) => {
     const validation = () => {
         if (!touched.Email || !touched.Password) {
             setFormError({ ...formError, Error: 'Please fill in all the fields' })
+            return false;
         }
-        else {
-            if (formError.Email === '' || formError.Password === '') {
-                setFormError({ ...formError, 'Error': '' })
-                return true;
+        else{
+            if(email==='' && password===''){
+                setFormError({...formError,Email:"required",Password:"required"})
+                return false
             }
+            else if(email===''){
+                setFormError({...formError,Email:"required"})
+                return false
+            }
+            else if(password===''){
+                setFormError({...formError,Password:"required"}) 
+                return false
+            }
+
+            return true;
         }
-        return false;
     }
 
     const handleSubmit = async () => {
@@ -51,9 +61,11 @@ const Login = ({ navigation }) => {
                             .then(doc => {
                                 const data = doc.data();
                                 if (data.role === 'Student') {
+                                    setClickedBtn(false);
                                     navigation.navigate('Dashboard');
                                 }
                                 else {
+                                    setClickedBtn(false);
                                     navigation.navigate('CoordinatorDashboard');
                                 }
                             }, err => {
@@ -70,7 +82,6 @@ const Login = ({ navigation }) => {
             catch (err) {
                 console.log(err);
             }
-            setClickedBtn(false);
         }
 
     };
@@ -84,7 +95,6 @@ const Login = ({ navigation }) => {
             }
             else {
                 setFormError({ ...formError, Email: '', Error: '' })
-                setError('');
             }
         }
         else {
@@ -94,11 +104,13 @@ const Login = ({ navigation }) => {
             }
             else {
                 setFormError({ ...formError, "Password": '', Error: '' })
-                setError('');
             }
         }
-        setTouched({ ...touched, [name]: true })
     };
+    const onFocus=(name)=>{
+        setTouched({...touched,[name]:true})
+        setError('')
+    }
 
     return (
         !clickedBtn ? (
@@ -121,6 +133,7 @@ const Login = ({ navigation }) => {
                                 placeholder="Enter email"
                                 value={email}
                                 onChangeText={(value) => onChange(value, 'Email')}
+                                onFocus={()=>{onFocus('Email')}}
                             />
                         </TouchableOpacity>
                         {formError.Email !== '' ? (
@@ -136,6 +149,7 @@ const Login = ({ navigation }) => {
                                 value={password}
                                 secureTextEntry={true}
                                 onChangeText={(value) => onChange(value, 'Password')}
+                                onFocus={()=>{onFocus('Password')}}
                             />
                         </TouchableOpacity>
                         {formError.Password !== '' ? (
@@ -155,7 +169,15 @@ const Login = ({ navigation }) => {
                         <View style={styles.bottom}>
                             <Text>Not a Member?
                                 <TouchableOpacity
-                                    onPress={() => navigation.navigate('Register')}
+                                    onPress={() => {
+                                        setFormError({...formError,Email:'',Password:'',Error:''})
+                                        setTouched({...touched,Email:false,Password:false})
+                                        setEmail('');
+                                        setPassword('');
+                                        setError('');
+                                        setClickedBtn(false);
+                                        navigation.navigate('Register')
+                                        }}
                                 >
                                     <Text style={styles.bottomText}>{' '}Sign Up</Text>
                                 </TouchableOpacity>
@@ -198,8 +220,7 @@ const styles = StyleSheet.create({
     },
     formInputText: {
         borderRadius: 12,
-        backgroundColor: '#184E77',
-        color: 'black',
+        backgroundColor: '#4a8cff',
         padding: 8,
     },
     button: {

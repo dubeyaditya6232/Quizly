@@ -54,10 +54,10 @@ const styles = StyleSheet.create({
     block: {
         padding: 10,
         borderWidth: 1,
-        borderColor: 'blue',
+        borderColor: '#07255b',
         margin: 10,
         borderRadius: 10,
-        backgroundColor: 'gray',
+        backgroundColor: '#4a8cff',
     },
     blockText: {
         fontSize: 14,
