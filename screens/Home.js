@@ -1,7 +1,10 @@
-import { View, Text, TouchableOpacity, StyleSheet, BackHandler, Alert, ScrollView,Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, BackHandler, Alert, ScrollView, Image } from 'react-native';
 import React from 'react';
 import { useEffect } from 'react';
 import Title from '../components/Title';
+
+import { containerStyles, bannerStyles } from '../styles/styles';
+
 const Home = ({ navigation }) => {
 
   useEffect(() => {
@@ -33,11 +36,11 @@ const Home = ({ navigation }) => {
 
   return (
     <ScrollView>
-      <View style={styles.container}>
+      <View style={containerStyles.container}>
         <Title />
-        <View style={styles.bannerContainer}>
+        <View style={bannerStyles.bannerContainer}>
           <Image source={require('../assets/quiz.png')}
-            style={styles.banner}
+            style={bannerStyles.banner}
             resizeMode="contain"
           />
         </View>
@@ -67,11 +70,6 @@ const Home = ({ navigation }) => {
 export default Home;
 
 const styles = StyleSheet.create({
-  container: {
-    paddingTop: 40,
-    height: '100%',
-    paddingHorizontal: 16,
-  },
   button: {
     flexDirection: 'column',
     justifyContent: 'space-around',
@@ -83,15 +81,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#4a8cff',
     borderRadius: 12,
     marginBottom: 16,
-  },
-  banner: {
-    height: 300,
-    width: 300,
-  },
-  bannerContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
   },
 });
 

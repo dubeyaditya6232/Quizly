@@ -1,8 +1,7 @@
-import { View, Text, TouchableOpacity, StyleSheet, TextInput ,ScrollView} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native';
 import React from 'react';
 import Title from '../components/Title';
 import { useState } from 'react';
-import { useValidation } from 'react-native-form-validator';
 
 
 
@@ -11,19 +10,8 @@ const Login = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const { validate, isFieldInError, getErrorsInField, getErrorMessages } =
-        useValidation({
-            state: {
-                email,
-                password,
-            },
-        });
-
     const handleSubmit = async () => {
-        validate({
-            email: { email: true },
-            password: { minlength: 6, maxlength: 20, required: true },
-        });
+        alert('under construction');
     };
 
     return (
@@ -44,9 +32,6 @@ const Login = ({ navigation }) => {
                             value={email}
                             onChangeText={(value) => setEmail(value)}
                         />
-                        {isFieldInError('email') && getErrorsInField('email').map(errorMessage => (
-                            <Text style={styles.errorText}>{errorMessage}</Text>
-                        ))}
                     </TouchableOpacity>
                     <Text style={styles.formText}>password</Text>
                     <TouchableOpacity
@@ -59,9 +44,6 @@ const Login = ({ navigation }) => {
                             secureTextEntry={true}
                             onChangeText={(value) => setPassword(value)}
                         />
-                        {isFieldInError('password') && getErrorsInField('password').map(errorMessage => (
-                            <Text style={styles.errorText}>{errorMessage}</Text>
-                        ))}
                     </TouchableOpacity>
                 </View>
                 <View style={styles.button}>
@@ -71,7 +53,6 @@ const Login = ({ navigation }) => {
                         <Text style={styles.buttonText}>Login</Text>
                     </TouchableOpacity>
                 </View>
-                <Text>{getErrorMessages()}</Text>
             </View>
         </ScrollView>
     );

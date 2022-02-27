@@ -7,6 +7,8 @@ import { doc, updateDoc, getDoc, arrayUnion } from 'firebase/firestore';
 import { useUserAuth } from '../useContext';
 import Loading from '../components/Loading';
 
+import { containerStyles } from '../styles/styles';
+
 const Quiz = ({ navigation, route }) => {
 
   const { user } = useUserAuth();
@@ -212,7 +214,7 @@ const Quiz = ({ navigation, route }) => {
 
   return (
     <ScrollView>
-      <View style={styles.container}>
+      <View style={containerStyles.container}>
         {(loading === false) ? questions.length > 0 ?
           (
             <View style={styles.parent}>
@@ -238,6 +240,7 @@ const Quiz = ({ navigation, route }) => {
               </View>
               <View style={styles.bottom}>
                 <TouchableOpacity
+                  disabled={currentQuestion === 0}
                   onPress={handlePrevious}
                   style={styles.button}>
                   <Text style={styles.buttonText} >Previous </Text>
@@ -250,6 +253,7 @@ const Quiz = ({ navigation, route }) => {
                   </TouchableOpacity>
                 ) : (<View></View>)}
                 <TouchableOpacity
+                  disabled={currentQuestion === questions.length - 1}
                   onPress={handleNext}
                   style={styles.button}>
                   <Text style={styles.buttonText} >Next </Text>
@@ -257,10 +261,7 @@ const Quiz = ({ navigation, route }) => {
               </View>
             </View>)
           : (<Loading loadingMsg={"Loading Questions"} />)
-          : (
-            <View>
-              <Text>Loading...</Text>
-            </View>
+          : (<Loading loadingMsg={"Loading Test"} />
           )}
       </View>
     </ScrollView>
@@ -270,11 +271,6 @@ const Quiz = ({ navigation, route }) => {
 export default Quiz;
 
 const styles = StyleSheet.create({
-  container: {
-    paddingTop: 40,
-    paddingHorizontal: 16,
-    height: '100%',
-  },
   top: {
     marginVertical: 16,
     padding: 12,

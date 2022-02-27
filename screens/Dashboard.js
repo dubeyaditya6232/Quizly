@@ -7,6 +7,8 @@ import { collection, query, where, onSnapshot } from 'firebase/firestore';
 
 import { useUserAuth } from '../useContext';
 
+import { containerStyles, errorStyles, bannerStyles } from '../styles/styles';
+
 const Dashboard = ({ navigation }) => {
 
     const { user, logout } = useUserAuth();
@@ -89,7 +91,7 @@ const Dashboard = ({ navigation }) => {
     };
     const handleTestClick = (test) => {
         setSearchResult([]);
-        setLoading(true);
+        setLoading(false);
         setSearchError('');
         navigation.navigate('Quiz', { test });
     }
@@ -99,7 +101,7 @@ const Dashboard = ({ navigation }) => {
             <Text>user not Logged In</Text>
         ) : (
             <ScrollView>
-                <View style={styles.container}>
+                <View style={containerStyles.container}>
                     <Title />
                     <TouchableOpacity
                         style={styles.logoutButton}
@@ -107,9 +109,9 @@ const Dashboard = ({ navigation }) => {
                     >
                         <Text style={styles.logoutButtonText}>Logout</Text>
                     </TouchableOpacity>
-                    <View style={styles.bannerContainer}>
+                    <View style={bannerStyles.bannerContainer}>
                         <Image source={require('../assets/quiz.png')}
-                            style={styles.banner}
+                            style={bannerStyles.banner}
                             resizeMode="contain"
                         />
                     </View>
@@ -137,8 +139,8 @@ const Dashboard = ({ navigation }) => {
                         </TouchableOpacity>
                     </View>
                     {!searchError ? null : (
-                        <View style={styles.error}>
-                            <Text style={styles.errorText}>{searchError}</Text>
+                        <View style={errorStyles.error}>
+                            <Text style={errorStyles.errorText}>{searchError}</Text>
                         </View>
                     )}
                     <View>
@@ -175,20 +177,6 @@ const Dashboard = ({ navigation }) => {
 export default Dashboard;
 
 const styles = StyleSheet.create({
-    container: {
-        paddingTop: 40,
-        paddingHorizontal: 16,
-        height: '100%',
-    },
-    banner: {
-        height: 300,
-        width: 300,
-    },
-    bannerContainer: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        flex: 1,
-    },
     buttonContainer: {
         flexDirection: 'row',
         width: '100%',
@@ -247,10 +235,6 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: '600',
         padding: 8,
-    },
-    errorText: {
-        fontSize: 16,
-        color: 'red',
     },
 });
 

@@ -9,6 +9,17 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { TimePicker } from 'react-native-simple-time-picker';
 import { Icon } from 'react-native-elements';
 
+import { errorStyles, containerStyles } from '../styles/styles';
+
+//import redundant function
+import {
+    handleAnswerChange,
+    validateAddOption,
+    addQuestionValidation,
+    handleQuestionChange,
+    addOptionInQuestion,
+} from '../utils/questionPage';
+
 const EditTest = ({ navigation, route }) => {
     const { test } = route.params;
     // eslint-disable-next-line no-unused-vars
@@ -53,43 +64,13 @@ const EditTest = ({ navigation, route }) => {
 
     const [error, setError] = useState([...fetchedError])
 
-    const validateAddOption = (index) => {
-        let check = questions[index].options.some(opt => opt.option === '')
-
-        if (check) {
-            let customError = [...error]
-            for (let i = 0; i < questions[index].options.length; i++) {
-                if (questions[index].options[i].option === '') {
-                    customError[index].options[i] = 'Required';
-                }
-            }
-            setError(customError);
-        }
-
-        return !check;
-    }
-
     const validateAddQuestion = () => {
-        let check = questions.some(ques => ques.question === '' || ques.answer==='' || ques.options.some(opt => opt.option === ''));
-
+        let check = questions.some(ques => ques.question === '' || ques.answer === '' || ques.options.some(opt => opt.option === ''));
         if (check) {
             let customError = [...error];
-            for (let i = 0; i < questions.length; i++) {
-                if (questions[i].question === '') {
-                    customError[i].question = 'Required'
-                }
-                if(questions[i].answer === ''){
-                    customError[i].answer = 'Required'
-                }
-                for (let j = 0; j < questions[i].options.length; j++) {
-                    if (questions[i].options[j].option === '') {
-                        customError[i].options[j] = 'Required'
-                    }
-                }
-            }
+            addQuestionValidation(questions, customError, error);
             setError(customError);
         }
-
         return !check
     };
 
@@ -145,7 +126,8 @@ const EditTest = ({ navigation, route }) => {
     }
 
     const addOption = (id, index) => {
-        if (validateAddOption(index)) {
+        if (validateAddOption(questions, index, error, setError)) {
+            addOptionInQuestion(questions, setQuestions, id, option)
             setQuestions(questions.map((question, index) => {
                 if (question.questionId === id) {
                     question.options.push(option);
@@ -178,39 +160,6 @@ const EditTest = ({ navigation, route }) => {
         let customError = [...error];
         customError[questionIndex].options.splice(optionIndex, 1);
         setError(customError);
-    };
-
-    const handleAnswerChange = (text, questionId,questionIndex) => {
-        setQuestions(questions.map(question => {
-            if (question.questionId === questionId) {
-                question.answer = text;
-            }
-            return question;
-        }));
-        let customError = [...error];
-        if(text===''){
-           customError[questionIndex].answer = 'Required';
-        }
-        else{
-            customError[questionIndex].answer = '';
-        }
-        setError(customError);
-    };
-
-    const handleQuestionChange = (text, questionId, index) => {
-        setQuestions(questions.map(question => {
-            if (question.questionId === questionId) {
-                question.question = text;
-            }
-            return question;
-        }));
-        let customError = [...error];
-        if (text.length === 0) {
-            customError[index].question = "Required";
-        }
-        else {
-            customError[index].question = null;
-        }
     };
 
     const handleOptionChange = (text, questionId, optionId, questionIndex, optionIndex) => {
@@ -252,12 +201,12 @@ const EditTest = ({ navigation, route }) => {
 
     return (
         <ScrollView>
-            <View style={styles.container}>
+            <View style={containerStyles.container}>
                 <View style={styles.heading}>
                     <Text style={styles.headingText}>Edit Test Details</Text>
                 </View>
-                <View style={styles.errorContainer}>
-                    {!firebaseError ? null : <Text style={styles.errorText}>{firebaseError}</Text>}
+                <View style={errorStyles.error}>
+                    {!firebaseError ? null : <Text style={errorStyles.errorText}>{firebaseError}</Text>}
                 </View>
                 <View>
                     <Text>Test Name</Text>
@@ -280,7 +229,7 @@ const EditTest = ({ navigation, route }) => {
                             }}
                         />
                     </TouchableOpacity>
-                    {!testNameError ? null : <Text style={styles.errorText}>{testNameError}</Text>}
+                    {!testNameError ? null : <Text style={errorStyles.errorText}>{testNameError}</Text>}
                     <Text>Test Date</Text>
                     <TouchableOpacity
                         onPress={() => setShowDateSelector(true)}
@@ -359,7 +308,7 @@ const EditTest = ({ navigation, route }) => {
                                         onChangeText={(text) => { handleQuestionChange(text, ques.questionId, index) }}
                                     />
                                 </TouchableOpacity>
-                                {!error[index].question ? null : <Text style={styles.errorText}>{error[index].question}</Text>}
+                                {!error[index].question ? null : <Text style={errorStyles.errorText}>{error[index].question}</Text>}
                                 {
                                     ques.options.map((option, idx) => {
                                         return (
@@ -387,7 +336,7 @@ const EditTest = ({ navigation, route }) => {
                                                         }}
                                                     />
                                                 </TouchableOpacity>
-                                                {!error[index].options[idx] ? null : <Text style={styles.errorText}>{error[index].options[idx]}</Text>}
+                                                {!error[index].options[idx] ? null : <Text style={errorStyles.errorText}>{error[index].options[idx]}</Text>}
                                             </View>
                                         );
                                     })
@@ -405,17 +354,17 @@ const EditTest = ({ navigation, route }) => {
                                     selectedValue={ques.answer}
                                     style={styles.formInputText}
                                     onValueChange={(itemValue, itemIndex) => {
-                                        handleAnswerChange(itemValue, ques.questionId, index)
+                                        handleAnswerChange(itemValue, ques.questionId, index, questions, setQuestions, error, setError)
                                     }}
                                 >
-                                    <Picker.Item  label='Select Options' value='' key='Select'/>
+                                    <Picker.Item label='Select Options' value='' key='Select' />
                                     {ques.options.map((option, index) => {
                                         return (
                                             <Picker.Item label={option.option} value={option.option} key={option.optionId} />
                                         )
                                     })}
                                 </Picker>
-                                {!error[index].answer ? null : <Text style={styles.errorText}>{error[index].answer}</Text>}
+                                {!error[index].answer ? null : <Text style={errorStyles.errorText}>{error[index].answer}</Text>}
                             </View>
                         );
                     })}
@@ -441,11 +390,6 @@ const EditTest = ({ navigation, route }) => {
 export default EditTest
 
 const styles = StyleSheet.create({
-    container: {
-        paddingTop: 40,
-        paddingHorizontal: 8,
-        height: '100%',
-    },
     input: {
         borderRadius: 16,
         backgroundColor: '#4a8cff',
@@ -507,14 +451,6 @@ const styles = StyleSheet.create({
     },
     Icon: {
         padding: 4,
-    },
-    errorText: {
-        color: "red",
-        padding: 4,
-    },
-    errorContainer: {
-        alignItems: 'center',
-        padding: 8,
     },
     formInputText: {
         backgroundColor: '#4a8cff',

@@ -1,7 +1,7 @@
-import { StyleSheet, Text, TouchableOpacity, View, TextInput, ScrollView,BackHandler} from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View, TextInput, ScrollView, BackHandler } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Title from '../components/Title'
-import React, { useState,useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import moment from 'moment';
 import { useUserAuth } from '../useContext';
 
@@ -11,6 +11,7 @@ import { collection, addDoc } from 'firebase/firestore';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { TimePicker } from 'react-native-simple-time-picker';
 
+import { containerStyles, titleStyles, errorStyles } from '../styles/styles';
 
 const CreateTest = ({ navigation }) => {
 
@@ -32,7 +33,7 @@ const CreateTest = ({ navigation }) => {
     });
 
     const handleSave = async () => {
-        
+
         const collectionRef = collection(db, 'Test');
         const data = {
             coordinatorId: user.uid,
@@ -56,8 +57,8 @@ const CreateTest = ({ navigation }) => {
         if (text === '') {
             setError({ ...error, [name]: 'Test name is required' })
         }
-        else if(text.length < 3) {
-            setError({ ...error, [name]: 'Test name must be atleast 3 characters' }) 
+        else if (text.length < 3) {
+            setError({ ...error, [name]: 'Test name must be atleast 3 characters' })
         }
         else {
             setError({ ...error, [name]: '', submitBtn: false })
@@ -80,10 +81,10 @@ const CreateTest = ({ navigation }) => {
 
     return (
         <ScrollView>
-            <View style={styles.container}>
+            <View style={containerStyles.container}>
                 <Title />
-                <View style={styles.pageTitle} >
-                    <Text style={styles.pageTitleText}>Create Test</Text>
+                <View style={titleStyles.pageTitle} >
+                    <Text style={titleStyles.pageTitleText}>Create Test</Text>
                 </View>
                 <View style={styles.form}>
                     <Text style={styles.inputLabel}>Test Name</Text>
@@ -95,7 +96,7 @@ const CreateTest = ({ navigation }) => {
                             onChangeText={(text) => onChange(text, 'testName')}
                         />
                     </TouchableOpacity>
-                    <Text style={styles.error}>{error.testName}</Text>
+                    <Text style={errorStyles.errorText}>{error.testName}</Text>
                     <Text style={styles.inputLabel}>Test Date</Text>
                     <TouchableOpacity
                         onPress={() => setShowDateSelector(true)}
@@ -168,20 +169,6 @@ const CreateTest = ({ navigation }) => {
 export default CreateTest
 
 const styles = StyleSheet.create({
-    container: {
-        paddingTop: 40,
-        height: '100%',
-    },
-    pageTitle: {
-        paddingVertical: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    pageTitleText: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        padding: 8
-    },
     form: {
         padding: 16,
     },
@@ -209,10 +196,6 @@ const styles = StyleSheet.create({
     TimePicker: {
         backgroundColor: '#4a8cff',
         borderRadius: 16,
-    },
-    error: {
-        color: 'red',
-        fontSize: 12,
     },
     notice: {
         fontSize: 12,

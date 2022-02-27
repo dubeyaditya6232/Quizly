@@ -8,6 +8,16 @@ import AddOption from '../components/AddOption';
 import { db } from '../firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 
+import { errorStyles, titleStyles,containerStyles } from '../styles/styles';
+
+//import redundant function
+import {
+  addQuestionValidation,
+  handleAnswerChange,
+  optionValidation,
+  handleQuestionChange
+} from '../utils/questionPage';
+
 const AddQuestions = ({ navigation }) => {
 
   const [ques, setQues] = useState({
@@ -36,49 +46,31 @@ const AddQuestions = ({ navigation }) => {
     saveMsg: ''
   }]);
   const [firebaseError, setFirebaseError] = useState(null);
-  
+
   const validation = () => {
     let customError = [...error];
     if (questions[questionIndex].question === '') {
       customError[questionIndex].question = 'Required';
     }
-    if(questions[questionIndex].answer === ''){
+    if (questions[questionIndex].answer === '') {
       customError[questionIndex].answer = 'Required';
     }
     const checkOptions = questions[questionIndex].options.some(opt => opt.option === '');
     if (checkOptions) {
-      for (let i = 0; i < questions[questionIndex].options.length; i++) {
-        if (questions[questionIndex].options[i] === '') {
-          customError[questionIndex].options[i] = 'Required'
-        }
-      }
+      optionValidation(questions[questionIndex].options, customError, questionIndex);
     }
     setError(customError);
 
     return !checkOptions;
-  }
+  };
 
   const submitValidation = () => {
     let check = questions.some((question) => {
-      return question.question === '' || question.answer==='' || question.options.some(opt => opt.option === '');
+      return question.question === '' || question.answer === '' || question.options.some(opt => opt.option === '');
     })
     if (check) {
       let customError = [...error];
-      for (let i = 0; i < questions.length; i++) {
-        if (questions[i].question === '') {
-          customError[i].question = 'Question is required'
-        }
-        if(questions[i].answer === ''){
-          customError[i].answer = 'Required'
-        }
-        if (questions[i].options.some(opt => opt.option === '')) {
-          for (let j = 0; j < questions[i].options.length; j++) {
-            if (questions[i].options[j].option === '') {
-              customError[i].options[j] = 'Option is required'
-            }
-          }
-        }
-      }
+      addQuestionValidation(questions, customError, error);
       for (let i = 0; i < error.length; i++) {
         if (error[i].saveMsg === '') {
           check = true;
@@ -89,41 +81,6 @@ const AddQuestions = ({ navigation }) => {
       setError(customError);
     }
     return !check;
-  };
-
-
-  const handleQuestionChange = (text, questionId) => {
-    setQuestions(questions.map(question => {
-      if (question.questionId === questionId) {
-        question.question = text;
-      }
-      return question;
-    }));
-    if (text.length === 0) {
-      let customError = [...error];
-      customError[questionIndex].question = "Question is required";
-    }
-    else {
-      let customError = [...error];
-      customError[questionIndex].question = null;
-    }
-  };
-
-  const handleAnswerChange = (text, questionId) => {
-    setQuestions(questions.map(question => {
-      if (question.questionId === questionId) {
-        question.answer = text;
-      }
-      return question;
-    }));
-    let customError = [...error];
-        if(text===''){
-           customError[questionIndex].answer = 'Required';
-        }
-        else{
-            customError[questionIndex].answer = '';
-        }
-        setError(customError);
   };
 
   const addQuestion = () => {
@@ -140,7 +97,7 @@ const AddQuestions = ({ navigation }) => {
           }],
           answer: '',
         });
-        setError(error.concat({ question: null, options: [], saveMsg: '',answer:'' }));
+        setError(error.concat({ question: null, options: [], saveMsg: '', answer: '' }));
       }
       else {
         alert("save options to continue");
@@ -184,12 +141,12 @@ const AddQuestions = ({ navigation }) => {
 
   return (
     <ScrollView>
-      <View style={styles.container}>
+      <View style={containerStyles.container}>
         <Title />
-        <View style={styles.pageTitle} >
-          <Text style={styles.pageTitleText}>AddQuestions</Text>
+        <View style={titleStyles.pageTitle} >
+          <Text style={titleStyles.pageTitleText}>AddQuestions</Text>
         </View>
-        {!firebaseError ? null : <Text style={styles.errorText}>{firebaseError}</Text>}
+        {!firebaseError ? null : <Text style={errorStyles.errorText}>{firebaseError}</Text>}
         <View>
           {
             questions.map((question, index) => {
@@ -201,11 +158,11 @@ const AddQuestions = ({ navigation }) => {
                       <TextInput
                         style={styles.input}
                         value={question.question}
-                        onChangeText={(text) => handleQuestionChange(text, question.questionId)}
+                        onChangeText={(text) => handleQuestionChange(text, question.questionId,questionIndex,questions,setQuestions,error,setError)}
                         placeholder="Enter Question"
                       />
                     </TouchableOpacity>
-                    {!error[index].question ? null : <Text style={styles.errorText}>{error[index].question}</Text>}
+                    {!error[index].question ? null : <Text style={errorStyles.errorText}>{error[index].question}</Text>}
                     <AddOption
                       questions={questions}
                       setQuestions={setQuestions}
@@ -218,16 +175,16 @@ const AddQuestions = ({ navigation }) => {
                       <Picker
                         selectedValue={question.answer}
                         style={styles.formInputText}
-                        onValueChange={(itemValue, itemIndex) => handleAnswerChange(itemValue, question.questionId)}
+                        onValueChange={(itemValue, itemIndex) => handleAnswerChange(itemValue, question.questionId, questionIndex, questions, setQuestions, error, setError)}
                       >
-                      <Picker.Item  label='Select Options' value='' key='Select'/>
+                        <Picker.Item label='Select Options' value='' key='Select' />
                         {question.options.map((option, index) => {
                           return (
                             <Picker.Item label={option.option} value={option.option} key={option.optionId} />
                           )
                         })}
                       </Picker>
-                      {!error[index].answer ? null : <Text style={styles.errorText}>{error[index].answer}</Text>}
+                      {!error[index].answer ? null : <Text style={errorStyles.errorText}>{error[index].answer}</Text>}
                     </View>
                     <View style={styles.navButton}>
                       <TouchableOpacity
@@ -278,17 +235,6 @@ const AddQuestions = ({ navigation }) => {
 export default AddQuestions
 
 const styles = StyleSheet.create({
-  container: {
-    paddingTop: 40,
-    paddingHorizontal: 12,
-  },
-  pageTitle: {
-    alignItems: 'center',
-    paddingVertical: 10,
-  },
-  pageTitleText: {
-    fontSize: 20,
-  },
   button: {
     marginTop: 16,
     backgroundColor: 'green',
@@ -331,7 +277,4 @@ const styles = StyleSheet.create({
     color: 'black',
     padding: 8,
   },
-  errorText: {
-    color: 'red',
-  }
 })

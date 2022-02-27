@@ -34,7 +34,7 @@ const ShowCards = ({ navigation, test, testList, setTestList }) => {
     };
 
     return (
-        <View style={styles.container}>
+        <View>
             <View style={styles.testBoxContainer}>
                 <Text style={styles.testBoxContainerText}>{test.testName}</Text>
                 <View style={styles.IconBlock}>
@@ -48,36 +48,6 @@ const ShowCards = ({ navigation, test, testList, setTestList }) => {
                             size={20}
                         />
                     </TouchableOpacity>
-                    {/* <TouchableOpacity
-                        style={styles.Icon}
-                        onPress={() => testDetails(test)}
-                    >
-                        <Icon
-                            name="clipboard-list"
-                            type="material-community"
-                            size={20}
-                        />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.Icon}
-                        onPress={() => editTest(test)}
-                    >
-                        <Icon
-                            name="edit"
-                            type="font-awesome"
-                            size={20}
-                        />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.Icon}
-                        onPress={() => deleteTest(test.id)}
-                    >
-                        <Icon
-                            name="delete"
-                            type="material-community"
-                            size={20}
-                        />
-                    </TouchableOpacity> */}
                 </View>
             </View>
             {menu && (
@@ -117,9 +87,6 @@ const ShowCards = ({ navigation, test, testList, setTestList }) => {
 export default ShowCards
 
 const styles = StyleSheet.create({
-    container: {
-        // height: '100%',
-    },
     testBoxContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',

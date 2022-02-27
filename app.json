@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "quizly",
+    "name": "QuizVenue",
     "slug": "quizly",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/quiz.png",
     "splash": {
@@ -24,7 +24,7 @@
     },
     "android": {
       "package":"com.dubey.quizly",
-      "versionCode": 2,
+      "versionCode": 3,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#000000"

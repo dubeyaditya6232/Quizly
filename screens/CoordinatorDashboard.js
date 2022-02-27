@@ -7,6 +7,8 @@ import { collection, query, onSnapshot, where } from 'firebase/firestore';
 
 import { useUserAuth } from '../useContext';
 
+import { containerStyles } from '../styles/styles';
+
 const CoordinatorDashboard = ({ navigation }) => {
     const [loading, setLoading] = useState(true);
     const [testList, setTestList] = useState([])
@@ -79,7 +81,7 @@ const CoordinatorDashboard = ({ navigation }) => {
     return (
         (user) ? (
             <ScrollView>
-                <View style={styles.container}>
+                <View style={containerStyles.container}>
                     <View style={styles.headingContainer}>
                         <Text style={styles.heading}>Welcome,{user.email}</Text>
                     </View>
@@ -132,11 +134,6 @@ const CoordinatorDashboard = ({ navigation }) => {
 export default CoordinatorDashboard
 
 const styles = StyleSheet.create({
-    container: {
-        paddingTop: 40,
-        paddingHorizontal: 12,
-        height: '100%',
-    },
     headingContainer: {
         alignItems: 'center',
     },

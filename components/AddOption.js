@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-nativ
 import React, { useState } from 'react'
 import uuid from 'react-native-uuid';
 import { Icon } from 'react-native-elements';
+import { addOptionInQuestion, validateAddOption } from '../utils/questionPage';
 
 const AddOption = ({ navigation, questions, setQuestions, questionIndex, error, setError}) => {
 
@@ -12,29 +13,9 @@ const AddOption = ({ navigation, questions, setQuestions, questionIndex, error, 
 
     const [optionArray, setOptionArray] = useState(questions[questionIndex].options);
     
-    const validateOption = () => {
-        let check = questions[questionIndex].options.some(opt => opt.option === '');
-        if (check) {
-            let updatedError = [...error];
-            for (let i = 0; i < questions[questionIndex].options.length; i++) {
-                if (questions[questionIndex].options[i].option === '') {
-                    updatedError[questionIndex].options[i] = 'Option is required'
-                }
-            }
-            setError(updatedError);
-        }
-
-        return !check;
-    };
-
     const addOption = () => {
-        if (validateOption()) {
-            setQuestions(questions.map(question => {
-                if (question.questionId === questions[questionIndex].questionId) {
-                    question.options.push(option);
-                }
-                return question;
-            }));
+        if (validateAddOption(questions, questionIndex, error, setError)) {
+            addOptionInQuestion(questions, setQuestions, questions[questionIndex].questionId, option);
             setOptionArray(optionArray.concat(option));
             setOption({
                 optionId: uuid.v4(),
@@ -80,7 +61,6 @@ const AddOption = ({ navigation, questions, setQuestions, questionIndex, error, 
     }
 
     const handleSave = () => {
-        console.log(error[questionIndex].options);
         if (validation()) {
             setQuestions(questions.map(question => {
                 if (question.questionId === questions[questionIndex].questionId) {

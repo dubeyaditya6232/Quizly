@@ -1,15 +1,18 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity, BackHandler, Alert, ScrollView } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { useUserAuth } from '../useContext';
+import Loading from '../components/Loading';
 
-const Result = ({ navigation,route }) => {
+import { containerStyles, titleStyles,bannerStyles } from '../styles/styles';
+
+const Result = ({ navigation, route }) => {
 
   // eslint-disable-next-line no-unused-vars
-  const {user} = useUserAuth();
+  const { user } = useUserAuth();
   const [Score, setScore] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  const {score} = route.params;
+  const { score } = route.params;
 
   const fetchScore = () => {
     setScore(score);
@@ -43,25 +46,23 @@ const Result = ({ navigation,route }) => {
     return () => {
       BackHandler.removeEventListener('hardwareBackPress', onBackPress);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <ScrollView>
-      <View style={styles.container}>
-        <View style={styles.title}>
-          <Text style={styles.titleText}>Result</Text>
+      <View style={containerStyles.container}>
+        <View style={titleStyles.pageTitle}>
+          <Text style={titleStyles.pageTitleText}>Result</Text>
         </View>
-        <View style={styles.bannerContainer}>
+        <View style={bannerStyles.bannerContainer}>
           <Image source={require('../assets/quiz.png')}
-            style={styles.banner}
+            style={bannerStyles.banner}
             resizeMode="contain"
           />
         </View>
         {loading ? (
-          <View style={styles.loading}>
-            <Text>Calculating</Text>
-          </View>
+          <Loading loadingMsg={"Calculating"} />
         ) : (
           <View style={styles.result}>
             <Text style={styles.resultText}>You scored : {Score}</Text>
@@ -82,34 +83,6 @@ const Result = ({ navigation,route }) => {
 export default Result;
 
 const styles = StyleSheet.create({
-  container: {
-    paddingTop: 40,
-    paddingHorizontal: 16,
-    height: '100%',
-  },
-  title: {
-    paddingTop: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  titleText: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  banner: {
-    height: 300,
-    width: 300,
-  },
-  bannerContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  loading: {
-    fontSize: 24,
-    fontWeight: '600',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   result: {
     alignItems: 'center',
     justifyContent: 'center',

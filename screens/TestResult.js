@@ -1,5 +1,7 @@
-import { ScrollView, StyleSheet, Text, View,BackHandler } from 'react-native'
-import React,{useEffect} from 'react'
+import { ScrollView, StyleSheet, Text, View, BackHandler } from 'react-native'
+import React, { useEffect } from 'react'
+
+import { testStyles, containerStyles } from '../styles/styles';
 
 const TestResult = ({ navigation, route }) => {
 
@@ -16,15 +18,15 @@ const TestResult = ({ navigation, route }) => {
         BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
         return () => {
-          BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+            BackHandler.removeEventListener('hardwareBackPress', onBackPress);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
         <ScrollView>
-            <View style={styles.container}>
-                <Text style={styles.title}>{test.testName}</Text>
+            <View style={containerStyles.container}>
+                <Text style={testStyles.title}>{test.testName}</Text>
                 {test.participants?.map((participant, index) => {
                     return (
                         <View key={participant.participantId} style={styles.block} >
@@ -41,16 +43,6 @@ const TestResult = ({ navigation, route }) => {
 export default TestResult
 
 const styles = StyleSheet.create({
-    container: {
-        paddingTop: 40,
-        padding: 10,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        padding: 8,
-        textAlign: 'center',
-    },
     block: {
         padding: 10,
         borderWidth: 1,
